@@ -1,378 +1,251 @@
-<!DOCTYPE HTML>
-<html>
+<!doctype html>
+<html lang="fr">
 
 <head>
-    <meta charset="utf-8" />
-    <title>Clock</title>
-</head>
+<meta charset="utf-8">
+<title>Horloge Fractionnaire</title>
+<style>
+body {
+	background-color: #FFE0D0;
+	text-align: center;
+}
 
-<script type="text/javascript">
-	var PosX =  new Array();
-	var PosY =  new Array();
-	var NbCotes = new Array();
-	var i;
-	var h, m, s, hh, mm, ss;
-	var d;
-	
-	
-	// Calcul des coordonnees des 60 points
-	for (i = 0; i <61; i++) {
-		PosX[i] = 300 + 240 * Math.sin(i * Math.PI / 30);
-		PosY[i] = 300 - 240 * Math.cos(i * Math.PI / 30);
-	}
-
-	// Definition du nombre de cotes des polygones
-	NbCotes[0] = 1;
-	NbCotes[1] = 60;
-	NbCotes[2] = 30;
-	NbCotes[3] = 20;
-	NbCotes[4] = 15;
-	NbCotes[5] = 12;
-	NbCotes[6] = 10;
-	NbCotes[7] = 60;
-	NbCotes[8] = 15;
-	NbCotes[9] = 20;
-	NbCotes[10] = 6;
-	NbCotes[11] = 60;
-	NbCotes[12] = 5;
-	NbCotes[13] = 60;
-	NbCotes[14] = 30;
-	NbCotes[15] = 4;
-	NbCotes[16] = 15;
-	NbCotes[17] = 60;
-	NbCotes[18] = 10;
-	NbCotes[19] = 60;
-	NbCotes[20] = 3;
-	NbCotes[21] = 20;
-	NbCotes[22] = 30;
-	NbCotes[23] = 60;
-	NbCotes[24] = 5;
-	NbCotes[25] = 12;
-	NbCotes[26] = 30;
-	NbCotes[27] = 20;
-	NbCotes[28] = 15;
-	NbCotes[29] = 60;
-	NbCotes[30] = 2;
-	NbCotes[31] = 60;
-	NbCotes[32] = 15;
-	NbCotes[33] = 20;
-	NbCotes[34] = 30;
-	NbCotes[35] = 12;
-	NbCotes[36] = 5;
-	NbCotes[37] = 60;
-	NbCotes[38] = 30;
-	NbCotes[39] = 20;
-	NbCotes[40] = 3;
-	NbCotes[41] = 60;
-	NbCotes[42] = 10;
-	NbCotes[43] = 60;
-	NbCotes[44] = 15;
-	NbCotes[45] = 4;
-	NbCotes[46] = 30;
-	NbCotes[47] = 60;
-	NbCotes[48] = 5;
-	NbCotes[49] = 60;
-	NbCotes[50] = 6;
-	NbCotes[51] = 20;
-	NbCotes[52] = 15;
-	NbCotes[53] = 60;
-	NbCotes[54] = 10;
-	NbCotes[55] = 12;
-	NbCotes[56] = 15;
-	NbCotes[57] = 20;
-	NbCotes[58] = 30;
-	NbCotes[59] = 60;
-	
-	// Definition des couleurs (soit en #RVB soit en anglais)
-	bgcolor = "#333333"; // fond
-	clockcolor = "#57532A"; // traits de l'horloge
-	hourscolor = "#888888"; // ecriture des chiffres de 1 a 12 
-	actifpolycolor = "#888800"; // polygone quand il est actif
-	allpolycolor = "#555555"; // polygones non-actif
-	alldotscolor = "#888888"; // des 60 points
-	allsommetscolor = "#DDDD88"; // de tout les sommets du polygone actif
-	actifsommetcolor = "#FF6600"; // du sommet actif
-	secondescolor = "#FF0000"; // aiguille des secondes
-	minutescolor = "#666666"; // aiguille des minutes
-	heurescolor = "#777777"; // aiguille des heures
-	txthoursfillcolor = "white"; // remplissage du texte de l'heure
-	txthoursstrokecolor = "black"; // contour du texte de l'heure
-	txtfrachoursfillcolor = "white"; // remplissage du texte de l'heure fractionnaire
-	txtfrachoursstrokecolor = "black"; // contour du texte de l'heure fractionnaire
-	
-	function draw()
-	{
-		// Lecture de l'heure
-		d = new Date();
-		h = d.getHours();
-		m = d.getMinutes();
-		s = d.getSeconds();
-		hh = h;
-		
-		// ajout du 0 pour la version texte des h, m, s
-		if (h < 10) {
-			hh = "0" + h;
-		}
-		mm = m;
-		if (m < 10) {
-			mm = "0" + m;
-		}
-		ss = s;
-		if (s < 10) {
-			ss = "0" + s;
-		}
-	
-		canvas = document.getElementById("myCanvas");
-		ctx = canvas.getContext("2d");
-		ctx.clearRect(0, 0, canvas.width, canvas.height);
-		ctx.fillStyle = bgcolor;
-		ctx.fillRect(0, 0, canvas.width, canvas.height);
-		
-		// Dessin des 2 cercles exterieurs
-		ctx.beginPath();
-		ctx.strokeStyle = clockcolor;
-		ctx.lineWidth = 2;
-		ctx.arc(300, 300, 290, 0, 2 * Math.PI);
-		ctx.stroke();
-		ctx.beginPath();
-		ctx.arc(300, 300, 250, 0, 2 * Math.PI);
-		ctx.stroke();
-		
-		// Dessin des 12 petits traits separant les heures
-		for (i = 0; i < 12; i++) {
-			ctx.beginPath();
-			ctx.moveTo(300 + 250 * Math.sin(i * Math.PI / 6), 300 - 250 * Math.cos(i * Math.PI / 6));
-			ctx.lineTo(300 + 290 * Math.sin(i * Math.PI / 6), 300 - 290 * Math.cos(i * Math.PI / 6));
-			ctx.stroke();
-		}
-
-		// Ecriture des nombres de 1 a 12 pour les heures
-		ctx.beginPath();
-		ctx.lineWidth = 1;
-		ctx.font = "bold 30px Arial";
-		ctx.textAlign = "center";
-		ctx.textBaseline = "middle";
-		ctx.fillStyle = hourscolor;
-		for (i = 1; i < 13; i++) {
-			ctx.fillText(i, (300 + 270 * Math.sin(i * Math.PI / 6)), (300 - 270 * Math.cos(i * Math.PI / 6)));
-			ctx.strokeText(i, (300 + 270 * Math.sin(i * Math.PI / 6)), (300 - 270 * Math.cos(i * Math.PI / 6)));
-		}
-		ctx.stroke();
-		
-		// Dessin de tous les polygones
-		// Trait milieu
-		ctx.beginPath();
-		ctx.strokeStyle = allpolycolor;
-		ctx.moveTo(PosX[0],PosY[0]);
-		ctx.lineTo(PosX[30],PosY[30]);
-		ctx.strokeStyle = allpolycolor;
-		ctx.stroke();		
-		
-		// Triangle
-		ctx.beginPath();
-		ctx.strokeStyle = actifpolycolor;
-		ctx.moveTo(PosX[0],PosY[0]);
-		for (i = 1; i < 3; i++) {
-			ctx.lineTo(PosX[i * 20],PosY[i * 20]);
-		}
-		ctx.lineTo(PosX[60],PosY[60]);
-		ctx.strokeStyle = allpolycolor;
-		ctx.stroke();
-		
-		// Carre
-		ctx.beginPath();
-		ctx.strokeStyle = actifpolycolor;
-		ctx.moveTo(PosX[0],PosY[0]);
-		for (i = 1; i < 4; i++) {
-			ctx.lineTo(PosX[i * 15],PosY[i * 15]);
-		}
-		ctx.lineTo(PosX[60],PosY[60]);
-		ctx.strokeStyle = allpolycolor;
-		ctx.stroke();
-		
-		// Pentagone
-		ctx.beginPath();
-		ctx.strokeStyle = actifpolycolor;
-		ctx.moveTo(PosX[0],PosY[0]);
-		for (i = 1; i < 5; i++) {
-			ctx.lineTo(PosX[i * 12],PosY[i * 12]);
-		}
-		ctx.lineTo(PosX[60],PosY[60]);
-		ctx.strokeStyle = allpolycolor;
-		ctx.stroke();		
-		
-		// Hexagone
-		ctx.beginPath();
-		ctx.strokeStyle = actifpolycolor;
-		ctx.moveTo(PosX[0],PosY[0]);
-		for (i = 1; i < 6; i++) {
-			ctx.lineTo(PosX[i * 10],PosY[i * 10]);
-		}
-		ctx.lineTo(PosX[60],PosY[60]);
-		ctx.strokeStyle = allpolycolor;
-		ctx.stroke();		
-		
-		// Decagone
-		ctx.beginPath();
-		ctx.strokeStyle = actifpolycolor;
-		ctx.moveTo(PosX[0],PosY[0]);
-		for (i = 1; i < 10; i++) {
-			ctx.lineTo(PosX[i * 6],PosY[i * 6]);
-		}
-		ctx.lineTo(PosX[60],PosY[60]);
-		ctx.strokeStyle = allpolycolor;
-		ctx.stroke();		
-		
-		// Dodecagone
-		ctx.beginPath();
-		ctx.strokeStyle = actifpolycolor;
-		ctx.moveTo(PosX[0],PosY[0]);
-		for (i = 1; i < 12; i++) {
-			ctx.lineTo(PosX[i * 5],PosY[i * 5]);
-		}
-		ctx.lineTo(PosX[60],PosY[60]);
-		ctx.strokeStyle = allpolycolor;
-		ctx.stroke();		
-		
-		// Pentadecagone
-		ctx.beginPath();
-		ctx.strokeStyle = actifpolycolor;
-		ctx.moveTo(PosX[0],PosY[0]);
-		for (i = 1; i < 15; i++) {
-			ctx.lineTo(PosX[i * 4],PosY[i * 4]);
-		}
-		ctx.lineTo(PosX[60],PosY[60]);
-		ctx.strokeStyle = allpolycolor;
-		ctx.stroke();		
-		
-		// Icosagone
-		ctx.beginPath();
-		ctx.strokeStyle = actifpolycolor;
-		ctx.moveTo(PosX[0],PosY[0]);
-		for (i = 1; i < 20; i++) {
-			ctx.lineTo(PosX[i * 3],PosY[i * 3]);
-		}
-		ctx.lineTo(PosX[60],PosY[60]);
-		ctx.strokeStyle = allpolycolor;
-		ctx.stroke();		
-		
-		// Triacontagone
-		ctx.beginPath();
-		ctx.strokeStyle = actifpolycolor;
-		ctx.moveTo(PosX[0],PosY[0]);
-		for (i = 1; i < 30; i++) {
-			ctx.lineTo(PosX[i * 2],PosY[i * 2]);
-		}
-		ctx.lineTo(PosX[60],PosY[60]);
-		ctx.strokeStyle = allpolycolor;
-		ctx.stroke();		
-		
-		// Hexacontagone
-		ctx.beginPath();
-		ctx.strokeStyle = actifpolycolor;
-		ctx.moveTo(PosX[0],PosY[0]);
-		for (i = 1; i < 60; i++) {
-			ctx.lineTo(PosX[i],PosY[i]);
-		}
-		ctx.lineTo(PosX[60],PosY[60]);
-		ctx.strokeStyle = allpolycolor;
-		ctx.stroke();		
-		
-		// Dessin du polygone actif
-		ctx.beginPath();
-		ctx.strokeStyle = actifpolycolor;
-		ctx.moveTo(PosX[0],PosY[0]);
-		for (i = 1; i < 61; i++) {
-			ctx.lineTo(PosX[(i * 60 / NbCotes[m])%60],PosY[(i * 60 / NbCotes[m])%60]);
-		}
-		ctx.lineWidth = 4;
-		ctx.stroke();
-		ctx.lineWidth = 1;
-		// Dessin de tout les sommets du polygone
-		for (i = 0; i < 60; i++) {
-			ctx.beginPath();
-			ctx.arc(PosX[i * 60 / NbCotes[m]], PosY[i * 60 / NbCotes[m]], 5, 0, 2 * Math.PI);
-			ctx.fillStyle = allsommetscolor;
-			ctx.fill();
-		}
-		
-		
-		// Dessin du sommet actif du polygone
-		ctx.beginPath();
-		ctx.arc(PosX[m], PosY[m], 5, 0, 2 * Math.PI);
-		ctx.fillStyle = actifsommetcolor;
-		ctx.fill();
-		
-		// Dessin des 60 sommets
-		for (i = 0; i <60; i++) {
-			ctx.beginPath();
-			ctx.arc(PosX[i], PosY[i], 5, 0, 2 * Math.PI);
-			ctx.strokeStyle = alldotscolor;
-			ctx.stroke();
-		}
-		
-		// Dessin de l'aiguille des secondes
-		ctx.beginPath();
-		ctx.moveTo(300,300);
-		ctx.lineTo(300 + 230 * Math.sin(s * Math.PI / 30), 300 - 230 * Math.cos(s * Math.PI / 30));
-		ctx.strokeStyle = secondescolor;
-		ctx.stroke();
-		
-		// Dessin de l'aiguille des minutes
-		ctx.lineWidth = 8;
-		ctx.beginPath();
-		ctx.moveTo(300,300);
-		ctx.lineTo(300 + 230 * Math.sin((m + s / 60) * Math.PI / 30), 300 - 230 * Math.cos((m + s / 60) * Math.PI / 30));
-		ctx.strokeStyle = minutescolor;
-		ctx.stroke();
-		
-		// Dessin de l'aiguille des heures
-		ctx.beginPath();
-		ctx.moveTo(300,300);
-		ctx.lineTo(300 + 180 * Math.sin(((h%12) + m / 60) * Math.PI / 6), 300 - 180 * Math.cos(((h%12) + m / 60) * Math.PI / 6));
-		ctx.strokeStyle = heurescolor;
-		ctx.stroke();
-		
-		// Ecriture de HH:MM:SS
-		ctx.lineWidth = 1;
-		ctx.font = "bold 60px Arial";
-		ctx.textAlign = "center";
-		ctx.textBaseline = "middle";
-		ctx.fillStyle = txthoursfillcolor;
-		ctx.strokeStyle = txthoursstrokecolor;
-		ctx.fillText(hh + ":" + mm + ":" + ss, 300, 200);
-		ctx.strokeText(hh + ":" + mm + ":" + ss, 300, 200);
-		ctx.fillStyle = txtfrachoursfillcolor;
-		ctx.strokeStyle = txtfrachoursstrokecolor;
-		// Ecriture de l'heure fractionnaire
-		if (m > 30) {
-			ctx.fillText(((h + 1) % 24) + "h - " + (((60 - m) * NbCotes[m]) / 60) + "/" + NbCotes[m], 300, 400);
-			ctx.strokeText(((h + 1) % 24)+ "h - " + (((60 - m) * NbCotes[m]) / 60) + "/" + NbCotes[m], 300, 400);
-		} else {
-			if (m > 0) {
-				ctx.fillText(h + "h + " + (m * NbCotes[m] / 60) + "/" + NbCotes[m], 300, 400);
-				ctx.strokeText(h + "h + " + (m * NbCotes[m] / 60) + "/" + NbCotes[m], 300, 400);
-			} else {
-				ctx.fillText(h + "h", 300, 400);
-				ctx.strokeText(h + "h", 300, 400);
-			}
-		}
-		
-		
-		
-		ctx.fillStyle = "black";
-		setInterval(draw,100);
-	}
-	
-
-
-</script>
+body > div { 
+	display: flex;
+	flex-wrap: wrap;
+}
+body > div > div { flex-grow: 1 }
+</style>
 
 <body onload="draw()">
 
-<canvas id="myCanvas" width="600" height="600"></canvas>
+<h1>Horloge fractionnaire</h1>
 
+<p> Pourquoi 60 minutes dans une heure ?
 
-</body>
-</html>
+<div>
+	<div>	
+		<h2>Le concept</h2>
+		<img src="./horloge.jpg" alt="Dessin de l'horloge fractionnaire au crayon.">
+	</div>
+	<div>
+		<h2>Le prototype</h2>
+		<canvas id="isn_cadre" width="600" height="700"></canvas>
+	</div>
+</div>
 
+<script>{ 'use strict';
+let sin = Math.sin, cos = Math.cos, PI = Math.PI;
+
+// Calcul des coordonnées des soixante sommets (un par minute)
+let PosX = new Array();
+let PosY = new Array();
+for (let i = 0 ; i < 60; ++i) {
+	PosX[i] = 300 + 240 * sin(i * PI/30);
+	PosY[i] = 300 - 240 * cos(i * PI/30);
+}
+
+// Définition du nombre de côtés des polygones/minutes
+const POLYCOTES = [60, 30, 20, 15, 12, 10, 6, 5, 4, 3, 2];
+const COTES = [
+	 2, 60, 30, 20, 15, 12, 10, 60, 15, 20,  6, 60,  5, 60, 30,
+	 4, 15, 60, 10, 60,  3, 20, 30, 60,  5, 12, 30, 20, 15, 60,
+	 2, 60, 15, 20, 30, 12,  5, 60, 30, 20,  3, 60, 10, 60, 15,
+	 4, 30, 60,  5, 60,  6, 20, 15, 60, 10, 12, 15, 20, 30, 60
+];
+
+// Définition des couleurs
+
+// Décor
+let c_fond     = "#333333";
+let c_horloge  = "#57532A";
+let c_chiffres = "#888888";
+
+// Couleurs des polygones
+let c_poly = [ "#FFFFFF", "#804000", "#800080", "#80FF80", "#FF3030", "#4000FF", "#FF8000", "#0080FF", "#FFA0A0", "#FFFF00", "#000000" ];
+
+// Sommets des polygones (marqueurs des minutes)
+let c_min      = "#888888";
+let c_min_poly = "#E0E0E0";
+let c_min_actu = "#FF0080";
+
+// Aiguilles
+let c_aig_sec = "#FF0000";
+let c_aig_min = "#A0A0A0";
+let c_aig_hr  = "#808080";
+
+// Affichage de l'heure courante (normale/fractionnaire)
+let c_txt_h_fill        = "#FFFFFF";
+let c_txt_h_stroke      = "#000000";
+let c_txt_frac_h_fill   = "#FFFFFF";
+let c_txt_frac_h_stroke = "#000000";
+
+function draw()
+{
+	// Lecture de l'heure
+	let d = new Date();
+	let h = d.getHours();
+	let m = d.getMinutes();
+	let s = d.getSeconds();
+
+	let ctx = document.getElementById("isn_cadre").getContext("2d");
+	ctx.fillStyle = c_fond;
+	ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+	// Dessin des deux cercles extérieurs
+	ctx.strokeStyle = c_horloge;
+	ctx.lineWidth = 2;
+
+	ctx.beginPath();
+	ctx.arc(300, 300, 290, 0, 2*PI);
+	ctx.stroke();
+
+	ctx.beginPath();
+	ctx.arc(300, 300, 250, 0, 2*PI);
+	ctx.stroke();
+
+	// Dessin des 12 petits traits séparant les heures
+	for (let i = 0 ; i < 12 ; ++i) {
+		ctx.beginPath();
+		ctx.moveTo(300 + 250 * sin(i * PI/6), 300 - 250 * cos(i * PI/6));
+		ctx.lineTo(300 + 290 * sin(i * PI/6), 300 - 290 * cos(i * PI/6));
+		ctx.stroke();
+	}
+
+	// Écriture des nombres de 1 À 12 pour les heures
+	ctx.lineWidth = 1;
+	ctx.font = "bold 30px arial";
+	ctx.textAlign = "center";
+	ctx.textBaseline = "middle";
+	ctx.fillStyle = c_chiffres;
+	for (let i = 1 ; i < 13 ; ++i) {
+		ctx.fillText(i, (300 + 270 * sin(i * PI/6)), (300 - 270 * cos(i * PI/6)));
+		ctx.strokeText(i, (300 + 270 * sin(i * PI/6)), (300 - 270 * cos(i * PI/6)));
+	}
+	ctx.stroke();
+
+	// Dessin de tous les polygones (+ contour)
+	for (let poly = 0 ; poly < POLYCOTES.length ; ++poly) {
+		ctx.beginPath();
+		ctx.moveTo(PosX[0], PosY[0]);
+		for (let i = 0 ; i < POLYCOTES[poly] ; ++i) {
+			let sommet = 60 * i/POLYCOTES[poly];
+			ctx.lineTo(PosX[sommet], PosY[sommet]);
+		}
+		ctx.lineTo(PosX[0], PosY[0]);
+		ctx.globalAlpha = 0.3;
+		ctx.fillStyle = c_poly[poly];
+		ctx.fill();
+
+		ctx.globalAlpha = 1;
+		ctx.strokeStyle = "#000000";
+		ctx.lineWidth = .5;
+		ctx.stroke();
+	}
+
+	// Dessin du polygone actif (+ contour)
+	let poly = POLYCOTES.indexOf(COTES[m]);
+	ctx.beginPath();
+	ctx.moveTo(PosX[0], PosY[0]);
+	for (let i = 0 ; i < COTES[m] ; ++i) {
+		let sommet = 60 * i/COTES[m];
+		ctx.lineTo(PosX[sommet], PosY[sommet]);
+	}
+	ctx.closePath();
+	ctx.globalAlpha = 0.6;
+	ctx.fillStyle = c_poly[poly];
+	ctx.fill();
+
+	ctx.globalAlpha = 1;
+	ctx.strokeStyle = "#000000";
+	ctx.lineWidth = 5;
+	ctx.stroke();
+
+	// Dessin de tout les sommets du polygone
+	ctx.fillStyle = c_min_poly;
+	ctx.lineWidth = 1;
+	for (let i = 0 ; i < COTES[m] ; ++i) {
+		let sommet = i * 60/COTES[m];
+		ctx.beginPath();
+		ctx.arc(PosX[sommet], PosY[sommet], 5, 0, 2*PI);
+
+		ctx.fill();
+	}
+
+	// Dessin des soixante sommets (minutes)
+	for (let i = 0 ; i < 60 ; ++i) {
+		ctx.beginPath();
+		ctx.arc(PosX[i], PosY[i], 5, 0, 2*PI);
+
+		ctx.strokeStyle = c_min;
+		ctx.stroke();
+	}
+
+	// Dessin du sommet actif
+	ctx.beginPath();
+	ctx.arc(PosX[m], PosY[m], 5, 0, 2*PI);
+
+	ctx.fillStyle = c_min_actu;
+	ctx.fill();
+
+	// Dessin de l'aiguille des heures
+	ctx.beginPath();
+	ctx.moveTo(300, 300);
+	ctx.lineTo(300 + 180 * sin(((h%12) + m/60) * PI/6), 300 - 180 * cos(((h%12) + m/60) * PI/6));
+
+	ctx.strokeStyle = c_aig_hr;
+	ctx.lineWidth = 8;
+	ctx.stroke();
+
+	// Dessin de l'aiguille des minutes
+	ctx.beginPath();
+	ctx.moveTo(300, 300);
+	ctx.lineTo(300 + 230 * sin((m + s/60) * PI/30), 300 - 230 * cos((m + s/60) * PI/30));
+
+	ctx.strokeStyle = c_aig_min;
+	ctx.lineWidth = 6;
+	ctx.stroke();
+
+	// Dessin de l'aiguille des secondes
+	ctx.beginPath();
+	ctx.moveTo(300, 300);
+	ctx.lineTo(300 + 230 * sin(s * PI/30), 300 - 230 * cos(s * PI/30));
+
+	ctx.strokeStyle = c_aig_sec;
+	ctx.lineWidth = 1;
+	ctx.stroke();
+
+	// Écriture de l'heure fractionnaire
+	ctx.font = "bold 60px arial";
+	ctx.fillStyle = c_txt_frac_h_fill;
+	ctx.strokeStyle = c_txt_frac_h_stroke;
+
+	let txt;
+	if (m > 30)
+		txt = ((h+1)%24) + "h - " + (((60-m) * COTES[m])/60) + "/" + COTES[m];
+	else if (m > 0)
+		txt = h + "h + " + (m * COTES[m]/60) + "/" + COTES[m];
+	else
+		txt = h + "h";
+
+	ctx.fillText(txt, 300, 625);
+	ctx.strokeText(txt, 300, 625);
+
+	// Écriture de l'heure normale (HH:MM:SS)
+	ctx.font = "bold 30px Arial";
+	ctx.textAlign = "center";
+	ctx.textBaseline = "middle";
+	ctx.fillStyle = c_txt_h_fill;
+	ctx.strokeStyle = c_txt_h_stroke;
+	ctx.lineWidth = 1;
+
+	// Ajout du zéro si nécessaire (format à deux chiffres des h/m/s)
+	let f2c = (x) => ((x < 10) ? "0" : "") + x;
+
+	txt = "(" + f2c(h) + ":" + f2c(m) + ":" + f2c(s) + ")";
+	ctx.fillText(txt, 300, 675);
+	ctx.strokeText(txt, 300, 675);
+}
+
+setInterval(draw, 1000);
+}</script>
